@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= title %></title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; line-height: 1.6; background: #f4f4f4; }
+    header { background: #333; color: #fff; padding: 1rem; }
+    header h1 { display: inline-block; margin-right: 20px; }
+    nav a { color: #fff; text-decoration: none; margin-right: 15px; }
+    .container { max-width: 1000px; margin: 20px auto; padding: 0 20px; }
+    .query-form { background: #fff; padding: 25px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; font-weight: bold; }
+    input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+    button { background: #007bff; color: #fff; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+    button:hover { background: #0056b3; }
+    .results { background: #fff; padding: 25px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .result-item { padding: 15px; border-bottom: 1px solid #eee; }
+    .result-item:last-child { border-bottom: none; }
+    pre { background: #f4f4f4; padding: 10px; border-radius: 5px; overflow-x: auto; }
+    .no-results { color: #666; text-align: center; padding: 20px; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Blog</h1>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/new-author">New Author</a>
+      <a href="/new-category">New Category</a>
+      <a href="/new-entry">New Entry</a>
+      <a href="/queries">Queries</a>
+      <a href="/changes">Changes</a>
+    </nav>
+  </header>
+  <div class="container">
+    <h2>MongoDB Queries</h2>
+    <form class="query-form" action="/queries" method="POST">
+      <div class="form-group">
+        <label>Select Query</label>
+        <select name="queryType" id="queryType" onchange="showFields()">
+          <option value="">-- Select a query --</option>
+          <option value="user-login">User Login (username & password)</option>
+          <option value="entries-by-user">Entries by User</option>
+          <option value="entries-no-additional">Entries without Additional Fields</option>
+          <option value="entries-more-than-1-image">Entries with More Than 1 Image</option>
+          <option value="entries-with-images">Entries with Images</option>
+          <option value="entries-author-lastname">Entries by Author Lastname or Admin</option>
+          <option value="title-in-content">Title Mentioned in Content</option>
+          <option value="users-sorted">All Users Sorted Ascending</option>
+          <option value="newest-2-entries">Newest 2 Entries</option>
+          <option value="second-oldest-entry">Second Oldest Entry</option>
+          <option value="entries-last-week-with-link">Entries Last Week with Links</option>
+          <option value="newest-comments-for-user">Newest 2 Comments for User's Entries</option>
+        </select>
+      </div>
+      
+      <div id="username-field" class="form-group hidden">
+        <label>Username</label>
+        <input type="text" name="username" placeholder="Username">
+      </div>
+      
+      <div id="password-field" class="form-group hidden">
+        <label>Password</label>
+        <input type="password" name="password" placeholder="Password">
+      </div>
+      
+      <div id="search-username-field" class="form-group hidden">
+        <label>Search Username</label>
+        <input type="text" name="searchUsername" placeholder="Username to search">
+      </div>
+      
+      <div id="lastname-field" class="form-group hidden">
+        <label>Lastname</label>
+        <input type="text" name="lastname" placeholder="Author lastname">
+      </div>
+      
+      <div id="title-search-field" class="form-group hidden">
+        <label>Title to Search</label>
+        <input type="text" name="titleSearch" placeholder="Title to search in content">
+      </div>
+      
+      <div id="comment-user-field" class="form-group hidden">
+        <label>Username for Comments</label>
+        <input type="text" name="commentUser" placeholder="Username">
+      </div>
+      
+      <button type="submit">Run Query</button>
+    </form>
+    
+    <% if (query) { %>
+      <div class="results">
+        <h3><%= query %></h3>
+        <% if (results) { %>
+          <% if (Array.isArray(results)) { %>
+            <% if (results.length > 0) { %>
+              <% results.forEach((r, i) => { %>
+                <div class="result-item">
+                  <pre><%= JSON.stringify(r, null, 2) %></pre>
+                </div>
+              <% }); %>
+            <% } else { %>
+              <p class="no-results">No results found</p>
+            <% } %>
+          <% } else { %>
+            <div class="result-item">
+              <pre><%= JSON.stringify(results, null, 2) %></pre>
+            </div>
+          <% } %>
+        <% } else { %>
+          <p class="no-results">No results</p>
+        <% } %>
+      </div>
+    <% } %>
+  </div>
+  
+  <script>
+    function showFields() {
+      const queryType = document.getElementById('queryType').value;
+      const fields = ['username-field', 'password-field', 'search-username-field', 'lastname-field', 'title-search-field', 'comment-user-field'];
+      fields.forEach(f => document.getElementById(f).classList.add('hidden'));
+      
+      if (queryType === 'user-login') {
+        document.getElementById('username-field').classList.remove('hidden');
+        document.getElementById('password-field').classList.remove('hidden');
+      } else if (queryType === 'entries-by-user') {
+        document.getElementById('search-username-field').classList.remove('hidden');
+      } else if (queryType === 'entries-author-lastname') {
+        document.getElementById('lastname-field').classList.remove('hidden');
+      } else if (queryType === 'title-in-content') {
+        document.getElementById('title-search-field').classList.remove('hidden');
+      } else if (queryType === 'newest-comments-for-user') {
+        document.getElementById('comment-user-field').classList.remove('hidden');
+      }
+    }
+  </script>
+</body>
+</html>

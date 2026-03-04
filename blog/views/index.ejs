@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= title %></title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; line-height: 1.6; background: #f4f4f4; }
+    header { background: #333; color: #fff; padding: 1rem; }
+    header h1 { display: inline-block; margin-right: 20px; }
+    nav a { color: #fff; text-decoration: none; margin-right: 15px; }
+    .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
+    .entry-card { background: #fff; padding: 20px; margin-bottom: 20px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .entry-card h2 a { color: #333; text-decoration: none; }
+    .entry-card h2 a:hover { color: #007bff; }
+    .meta { color: #666; font-size: 0.9rem; margin: 10px 0; }
+    .hashtags { margin-top: 10px; }
+    .hashtags span { background: #e0e0e0; padding: 2px 8px; border-radius: 3px; font-size: 0.8rem; margin-right: 5px; }
+    .no-entries { text-align: center; padding: 40px; color: #666; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Blog</h1>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/new-author">New Author</a>
+      <a href="/new-category">New Category</a>
+      <a href="/new-entry">New Entry</a>
+      <a href="/queries">Queries</a>
+      <a href="/changes">Changes</a>
+    </nav>
+  </header>
+  <div class="container">
+    <h2>Recent Entries</h2>
+    <% if (entries && entries.length > 0) { %>
+      <% entries.forEach(entry => { %>
+        <div class="entry-card">
+          <h2><a href="/entry/<%= entry._id %>"><%= entry.title %></a></h2>
+          <div class="meta">
+            By <%= entry.author ? entry.author.username : 'Unknown' %> | 
+            <%= entry.creationDate ? entry.creationDate.toLocaleDateString() : 'N/A' %> |
+            Category: <%= entry.category ? entry.category.name : 'Uncategorized' %> |
+            Views: <%= entry.impressionCount %>
+          </div>
+          <p><%= entry.description %></p>
+          <% if (entry.hashtags && entry.hashtags.length > 0) { %>
+            <div class="hashtags">
+              <% entry.hashtags.forEach(tag => { %>
+                <span>#<%= tag %></span>
+              <% }); %>
+            </div>
+          <% } %>
+        </div>
+      <% }); %>
+    <% } else { %>
+      <div class="no-entries">No entries yet. <a href="/new-entry">Create one!</a></div>
+    <% } %>
+  </div>
+</body>
+</html>

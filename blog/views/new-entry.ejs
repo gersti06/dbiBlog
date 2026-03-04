@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= title %></title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; line-height: 1.6; background: #f4f4f4; }
+    header { background: #333; color: #fff; padding: 1rem; }
+    header h1 { display: inline-block; margin-right: 20px; }
+    nav a { color: #fff; text-decoration: none; margin-right: 15px; }
+    .container { max-width: 800px; margin: 20px auto; padding: 0 20px; }
+    form { background: #fff; padding: 30px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; margin-bottom: 5px; font-weight: bold; }
+    input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+    textarea { min-height: 100px; }
+    .content-item { background: #f9f9f9; padding: 15px; margin-bottom: 15px; border-radius: 5px; }
+    .content-item select, .content-item input { margin-bottom: 10px; }
+    button { background: #28a745; color: #fff; padding: 12px 25px; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem; }
+    button:hover { background: #218838; }
+    .add-content { background: #007bff; margin-bottom: 20px; }
+    .add-content:hover { background: #0056b3; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Blog</h1>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/new-author">New Author</a>
+      <a href="/new-category">New Category</a>
+      <a href="/new-entry">New Entry</a>
+      <a href="/queries">Queries</a>
+      <a href="/changes">Changes</a>
+    </nav>
+  </header>
+  <div class="container">
+    <h2>Create New Entry</h2>
+    <form action="/entry" method="POST">
+      <div class="form-group">
+        <label>Title</label>
+        <input type="text" name="title" required>
+      </div>
+      
+      <div class="form-group">
+        <label>Author</label>
+        <select name="author" required>
+          <option value="">Select Author</option>
+          <% users.forEach(user => { %>
+            <option value="<%= user._id %>"><%= user.username %> (<%= user.name.firstname %> <%= user.name.lastname %>)</option>
+          <% }); %>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label>Category</label>
+        <select name="category">
+          <option value="">No Category</option>
+          <% categories.forEach(cat => { %>
+            <option value="<%= cat._id %>"><%= cat.name %></option>
+          <% }); %>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label>Description</label>
+        <textarea name="description" required></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label>Content Items</label>
+        <div id="content-items"></div>
+        <button type="button" class="add-content" onclick="addContentItem()">+ Add Content</button>
+      </div>
+      
+      <div class="form-group">
+        <label>
+          <input type="checkbox" name="commentsAllowed" checked style="width: auto;">
+          Allow Comments
+        </label>
+      </div>
+      
+      <button type="submit">Create Entry</button>
+    </form>
+  </div>
+  
+  <script>
+    let contentCount = 0;
+    
+    function addContentItem() {
+      const container = document.getElementById('content-items');
+      const div = document.createElement('div');
+      div.className = 'content-item';
+      div.innerHTML = `
+        <select name="content[${contentCount}][type]" onchange="updatePlaceholder(this, ${contentCount})">
+          <option value="text">Text</option>
+          <option value="link">Link</option>
+          <option value="image">Image (base64)</option>
+          <option value="video">Video URL</option>
+        </select>
+        <input type="text" name="content[${contentCount}][value]" placeholder="Content value" required>
+        <input type="text" name="content[${contentCount}][description]" placeholder="Description (optional)">
+        <button type="button" onclick="this.parentElement.remove()" style="background:#dc3545; padding:5px 10px; font-size:0.8rem;">Remove</button>
+      `;
+      container.appendChild(div);
+      contentCount++;
+    }
+    
+    function updatePlaceholder(select, index) {
+      const input = select.parentElement.querySelector('input[name^="content["]');
+      if (select.value === 'text') {
+        input.placeholder = 'Enter text content';
+      } else if (select.value === 'link') {
+        input.placeholder = 'Enter URL';
+      } else if (select.value === 'image') {
+        input.placeholder = 'Enter base64 image data';
+      } else if (select.value === 'video') {
+        input.placeholder = 'Enter video URL';
+      }
+    }
+  </script>
+</body>
+</html>

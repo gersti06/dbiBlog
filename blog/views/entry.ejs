@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= title %></title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; line-height: 1.6; background: #f4f4f4; }
+    header { background: #333; color: #fff; padding: 1rem; }
+    header h1 { display: inline-block; margin-right: 20px; }
+    nav a { color: #fff; text-decoration: none; margin-right: 15px; }
+    .container { max-width: 900px; margin: 20px auto; padding: 0 20px; }
+    .entry { background: #fff; padding: 30px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .entry h1 { margin-bottom: 10px; }
+    .meta { color: #666; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #eee; }
+    .content-item { margin-bottom: 20px; padding: 15px; background: #f9f9f9; border-radius: 5px; }
+    .content-item.text { background: none; padding: 10px 0; }
+    .content-item.link a { color: #007bff; }
+    .content-item.image img { max-width: 100%; border-radius: 5px; }
+    .content-item .description { color: #666; font-size: 0.9rem; margin-top: 5px; }
+    .comments-section { margin-top: 40px; }
+    .comment { background: #fff; padding: 15px; margin-bottom: 15px; border-radius: 5px; border-left: 3px solid #007bff; }
+    .comment-form { background: #fff; padding: 20px; border-radius: 5px; margin-top: 20px; }
+    .comment-form input, .comment-form textarea { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px; }
+    .comment-form button { background: #007bff; color: #fff; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+    .comment-form button:hover { background: #0056b3; }
+    .no-comments { color: #666; font-style: italic; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Blog</h1>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/new-author">New Author</a>
+      <a href="/new-category">New Category</a>
+      <a href="/new-entry">New Entry</a>
+      <a href="/queries">Queries</a>
+      <a href="/changes">Changes</a>
+    </nav>
+  </header>
+  <div class="container">
+    <div class="entry">
+      <h1><%= entry.title %></h1>
+      <div class="meta">
+        By <%= entry.author ? entry.author.username : 'Unknown' %> 
+        (<%= entry.author ? entry.author.name.firstname + ' ' + entry.author.name.lastname : '' %>) |
+        <%= entry.creationDate ? entry.creationDate.toLocaleDateString() : 'N/A' %> |
+        Category: <%= entry.category ? entry.category.name : 'Uncategorized' %> |
+        Views: <%= entry.impressionCount %>
+      </div>
+      
+      <% if (entry.content && entry.content.length > 0) { %>
+        <% entry.content.forEach(item => { %>
+          <div class="content-item <%= item.type %>">
+            <% if (item.type === 'text') { %>
+              <p><%= item.value %></p>
+            <% } else if (item.type === 'link') { %>
+              <a href="<%= item.value %>" target="_blank"><%= item.description || item.value %></a>
+            <% } else if (item.type === 'image') { %>
+              <img src="data:image/png;base64,<%= item.value %>" alt="<%= item.description || 'Image' %>">
+              <% if (item.description) { %>
+                <div class="description"><%= item.description %></div>
+              <% } %>
+            <% } else if (item.type === 'video') { %>
+              <video src="<%= item.value %>" controls></video>
+            <% } %>
+          </div>
+        <% }); %>
+      <% } %>
+      
+      <% if (entry.hashtags && entry.hashtags.length > 0) { %>
+        <div style="margin-top: 20px;">
+          <% entry.hashtags.forEach(tag => { %>
+            <span style="background: #e0e0e0; padding: 2px 8px; border-radius: 3px; margin-right: 5px;">#<%= tag %></span>
+          <% }); %>
+        </div>
+      <% } %>
+    </div>
+    
+    <div class="comments-section">
+      <h3>Comments (<%= comments ? comments.length : 0 %>)</h3>
+      
+      <% if (comments && comments.length > 0) { %>
+        <% comments.forEach(comment => { %>
+          <div class="comment">
+            <strong><%= comment.author.username %></strong>
+            <span style="color: #666; font-size: 0.8rem;"> - <%= comment.creationDate ? comment.creationDate.toLocaleString() : '' %></span>
+            <p><%= comment.content %></p>
+          </div>
+        <% }); %>
+      <% } else { %>
+        <p class="no-comments">No comments yet.</p>
+      <% } %>
+      
+      <% if (entry.commentsAllowed) { %>
+        <div class="comment-form">
+          <h4>Add a Comment</h4>
+          <form action="/entry/<%= entry._id %>/comment" method="POST">
+            <input type="text" name="username" placeholder="Your username" required type="email">
+            <input name="email" placeholder="Your email (optional)">
+            <textarea name="content" placeholder="Your comment" rows="4" required></textarea>
+            <button type="submit">Submit Comment</button>
+          </form>
+        </div>
+      <% } else { %>
+        <p style="color: #666; margin-top: 20px;">Comments are disabled for this entry.</p>
+      <% } %>
+    </div>
+  </div>
+</body>
+</html>
