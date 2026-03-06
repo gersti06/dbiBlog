@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
+router.use(express.static('public'));
+
 const entriesRouter = require('./entries');
 const usersRouter = require('./users');
 const categoriesRouter = require('./categories');
