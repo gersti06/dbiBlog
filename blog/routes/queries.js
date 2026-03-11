@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const User = require('../models/User');
 const Entry = require('../models/Entry');
 const Comment = require('../models/Comment');
 
 router.get('/queries', (req, res) => {
-  res.render('queries', { title: 'Query Results', results: null, query: '' });
+  res.render('queries', { title: 'Query Results', results: null, query: '', error: null });
 });
 
 router.post('/queries', async (req, res) => {
@@ -13,6 +14,11 @@ router.post('/queries', async (req, res) => {
     const queryType = req.body.queryType;
     let result;
     let query = '';
+    let error = null;
+    
+    if (!queryType) {
+      return res.render('queries', { title: 'Query Results', results: null, query: 'Please select a query type', error: 'No query type selected' });
+    }
     
     switch (queryType) {
       case 'user-login':
@@ -134,15 +140,23 @@ router.post('/queries', async (req, res) => {
         
       default:
         result = [];
+        error = 'Unknown query type';
     }
     
     res.render('queries', { 
       title: 'Query Results', 
       results: result, 
-      query: query + (result ? ` (${Array.isArray(result) ? result.length : 1} results)` : '')
+      query: query + (result ? ` (${Array.isArray(result) ? result.length : 1} results)` : ''),
+      error: null
     });
   } catch (err) {
-    res.status(500).send('Query error: ' + err.message);
+    console.error('Query error:', err);
+    res.render('queries', { 
+      title: 'Query Results', 
+      results: null, 
+      query: 'Query failed',
+      error: 'An error occurred while executing the query. Please try again.'
+    });
   }
 });
 

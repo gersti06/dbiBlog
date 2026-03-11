@@ -15,6 +15,14 @@ router.post('/new-author', async (req, res) => {
       return res.render('new-author', { title: 'New Author', error: 'Username already exists' });
     }
     
+    if (!username || username.trim() === '') {
+      return res.render('new-author', { title: 'New Author', error: 'Username is required' });
+    }
+    
+    if (!password || password.length < 4) {
+      return res.render('new-author', { title: 'New Author', error: 'Password must be at least 4 characters' });
+    }
+    
     const newUser = new User({
       username,
       name: { firstname, lastname },

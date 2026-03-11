@@ -43,6 +43,15 @@ async function createIndexes() {
 
 app.use(routes);
 
+app.use((req, res) => {
+  res.status(404).render('error', { title: '404 - Not Found', message: 'Page not found' });
+});
+
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  res.status(500).render('error', { title: '500 - Server Error', message: 'An unexpected error occurred' });
+});
+
 const PORT = process.env.PORT || 3000;
 connectDB().then(() => {
   app.listen(PORT, () => {

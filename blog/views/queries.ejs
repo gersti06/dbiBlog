@@ -21,6 +21,7 @@
     pre { background: #f4f4f4; padding: 10px; border-radius: 5px; overflow-x: auto; }
     .no-results { color: #666; text-align: center; padding: 20px; }
     .hidden { display: none; }
+    .error-message { background: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #f5c6cb; }
   </style>
 </head>
 <body>
@@ -37,6 +38,11 @@
   </header>
   <div class="container">
     <h2>MongoDB Queries</h2>
+    
+    <% if (error) { %>
+      <div class="error-message"><%= error %></div>
+    <% } %>
+    
     <form class="query-form" action="/queries" method="POST">
       <div class="form-group">
         <label>Select Query</label>

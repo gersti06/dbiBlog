@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const Entry = require('../models/Entry');
 const User = require('../models/User');
 const Category = require('../models/Category');
@@ -19,6 +20,10 @@ router.get('/', async (req, res) => {
 
 router.get('/entry/:id', async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).render('error', { title: '400 - Invalid ID', message: 'The provided ID is not a valid format' });
+    }
+    
     const entry = await Entry.findById(req.params.id)
       .populate('author', 'username name')
       .populate('category', 'name');
@@ -50,9 +55,28 @@ router.get('/new-entry', async (req, res) => {
 
 router.post('/entry', async (req, res) => {
   try {
-    const { title, author, category, description, content, commentsAllowed } = req.body;
+    const { title, author, category, description, commentsAllowed } = req.body;
+    
+    if (!title || title.trim() === '') {
+      const categories = await Category.find();
+      const users = await User.find();
+      return res.render('new-entry', { categories, users, title: 'New Entry', error: 'Title is required' });
+    }
+    
+    if (!author) {
+      const categories = await Category.find();
+      const users = await User.find();
+      return res.render('new-entry', { categories, users, title: 'New Entry', error: 'Author is required' });
+    }
+    
+    if (category && !mongoose.Types.ObjectId.isValid(category)) {
+      const categories = await Category.find();
+      const users = await User.find();
+      return res.render('new-entry', { categories, users, title: 'New Entry', error: 'Invalid category selected' });
+    }
     
     const contentArray = [];
+    const content = req.body.content;
     if (content && Array.isArray(content)) {
       content.forEach((item, index) => {
         const type = req.body[`content[${index}][type]`];
@@ -79,7 +103,7 @@ router.post('/entry', async (req, res) => {
     await entry.save();
     res.redirect('/');
   } catch (err) {
-    res.status(500).send('Error creating entry: ' + err.message);
+    res.status(500).render('error', { title: '500 - Server Error', message: 'Error creating entry: ' + err.message });
   }
 });
 

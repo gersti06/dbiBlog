@@ -20,6 +20,7 @@
     button:hover { background: #218838; }
     .add-content { background: #007bff; margin-bottom: 20px; }
     .add-content:hover { background: #0056b3; }
+    .error-message { background: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #f5c6cb; }
   </style>
 </head>
 <body>
@@ -36,6 +37,9 @@
   </header>
   <div class="container">
     <h2>Create New Entry</h2>
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="error-message"><%= error %></div>
+    <% } %>
     <form action="/entry" method="POST">
       <div class="form-group">
         <label>Title</label>

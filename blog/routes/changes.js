@@ -47,6 +47,9 @@ router.post('/changes', async (req, res) => {
         break;
         
       case 'rename-category':
+        if (!mongoose.Types.ObjectId.isValid(req.body.categoryId)) {
+          return res.render('changes', { title: 'Data Changes', message: 'Invalid Category ID', entries: [], users: [], categories: [] });
+        }
         await Category.findByIdAndUpdate(req.body.categoryId, {
           $set: { name: req.body.newName }
         });

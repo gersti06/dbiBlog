@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= title %></title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; line-height: 1.6; background: #f4f4f4; }
+    header { background: #333; color: #fff; padding: 1rem; }
+    header h1 { display: inline-block; margin-right: 20px; }
+    nav a { color: #fff; text-decoration: none; margin-right: 15px; }
+    .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
+    .error-box { background: #fff; padding: 40px; margin: 40px auto; max-width: 600px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; }
+    .error-box h2 { color: #d9534f; margin-bottom: 20px; }
+    .error-box p { color: #666; margin-bottom: 20px; }
+    .error-box a { display: inline-block; padding: 10px 20px; background: #007bff; color: #fff; text-decoration: none; border-radius: 5px; }
+    .error-box a:hover { background: #0056b3; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Blog</h1>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/new-author">New Author</a>
+      <a href="/new-category">New Category</a>
+      <a href="/new-entry">New Entry</a>
+      <a href="/queries">Queries</a>
+      <a href="/changes">Changes</a>
+    </nav>
+  </header>
+  <div class="container">
+    <div class="error-box">
+      <h2><%= title %></h2>
+      <p><%= message %></p>
+      <a href="/">Go to Home</a>
+    </div>
+  </div>
+</body>
+</html>
